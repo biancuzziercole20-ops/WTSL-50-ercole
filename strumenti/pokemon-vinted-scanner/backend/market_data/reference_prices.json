@@ -1,0 +1,76 @@
+{
+  "_comment": "Tabella di riferimento DEMO. Valori medi realistici (indicativi, non quotazioni ufficiali) usati solo in modalità demo/test. Chiave: 'pokemon|set|number' in minuscolo. 'raw' = prezzo medio carta non gradata in condizioni buone. 'graded' = valori per grading comuni.",
+  "cards": {
+    "charizard|obsidian flames|199/165": {
+      "raw": 45.0, "graded": {"PSA10": 350.0, "PSA9": 150.0, "PSA8": 90.0}
+    },
+    "charizard|base set|4/102": {
+      "raw": 380.0, "graded": {"PSA10": 14000.0, "PSA9": 4500.0, "PSA8": 1800.0}
+    },
+    "umbreon vmax|evolving skies|215/203": {
+      "raw": 290.0, "graded": {"PSA10": 900.0, "PSA9": 480.0, "PSA8": 350.0}
+    },
+    "pikachu|celebrations|5/25": {
+      "raw": 18.0, "graded": {"PSA10": 60.0, "PSA9": 35.0, "PSA8": 25.0}
+    },
+    "mewtwo|shining fates|sv49/sv94": {
+      "raw": 35.0, "graded": {"PSA10": 120.0, "PSA9": 65.0, "PSA8": 45.0}
+    },
+    "rayquaza vmax|evolving skies|218/203": {
+      "raw": 110.0, "graded": {"PSA10": 380.0, "PSA9": 210.0, "PSA8": 150.0}
+    },
+    "lugia|silver tempest|186/195": {
+      "raw": 55.0, "graded": {"PSA10": 220.0, "PSA9": 110.0, "PSA8": 75.0}
+    },
+    "giratina vstar|lost origin|131/196": {
+      "raw": 65.0, "graded": {"PSA10": 250.0, "PSA9": 130.0, "PSA8": 90.0}
+    },
+    "gengar|fusion strike|271/264": {
+      "raw": 75.0, "graded": {"PSA10": 280.0, "PSA9": 150.0, "PSA8": 100.0}
+    },
+    "mew|151|151/165": {
+      "raw": 40.0, "graded": {"PSA10": 130.0, "PSA9": 70.0, "PSA8": 50.0}
+    },
+    "espeon vmax|brilliant stars|203/172": {
+      "raw": 95.0, "graded": {"PSA10": 320.0, "PSA9": 170.0, "PSA8": 120.0}
+    },
+    "eevee|celebrations|8/25": {
+      "raw": 12.0, "graded": {"PSA10": 40.0, "PSA9": 22.0, "PSA8": 16.0}
+    },
+    "blastoise|base set|2/102": {
+      "raw": 150.0, "graded": {"PSA10": 3500.0, "PSA9": 1200.0, "PSA8": 500.0}
+    },
+    "venusaur|base set|15/102": {
+      "raw": 130.0, "graded": {"PSA10": 3000.0, "PSA9": 1000.0, "PSA8": 450.0}
+    },
+    "dragonite vstar|silver tempest|104/195": {
+      "raw": 30.0, "graded": {"PSA10": 100.0, "PSA9": 55.0, "PSA8": 40.0}
+    },
+    "sylveon vmax|evolving skies|203/203": {
+      "raw": 180.0, "graded": {"PSA10": 600.0, "PSA9": 320.0, "PSA8": 220.0}
+    },
+    "zacian v|sword & shield|138/202": {
+      "raw": 15.0, "graded": {"PSA10": 55.0, "PSA9": 28.0, "PSA8": 20.0}
+    },
+    "arceus vstar|brilliant stars|123/172": {
+      "raw": 70.0, "graded": {"PSA10": 260.0, "PSA9": 140.0, "PSA8": 95.0}
+    }
+  },
+  "type_multipliers_fallback": {
+    "_comment": "Usato solo quando la carta esatta non è in tabella: stima grezza basata sul tipo, da segnalare con sample_size=0 (nessun dato reale disponibile).",
+    "standard": 3.0,
+    "EX": 8.0,
+    "GX": 10.0,
+    "V": 12.0,
+    "VMAX": 40.0,
+    "VSTAR": 35.0,
+    "Full Art": 25.0,
+    "Illustration Rare": 60.0,
+    "Special Illustration Rare": 150.0,
+    "Hyper Rare": 90.0,
+    "Gold": 100.0,
+    "Secret Rare": 70.0,
+    "Promo": 10.0,
+    "Vintage": 50.0
+  }
+}

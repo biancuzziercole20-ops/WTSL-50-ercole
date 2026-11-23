@@ -1,0 +1,31 @@
+Lavora direttamente nella cartella aperta con Claude Code. Crea e salva un unico Expert Advisor per MetaTrader 5, scritto in MQL5, con il nome esatto USAS&P_ERCOLE.mq5. Conserva la & nel nome. Usa questo messaggio come unica fonte delle regole di trading.
+
+Strategia da implementare
+
+1. Dopo la chiusura dell’ultima seduta di borsa USA di ogni mese, considera tutte le società che in quella data compongono l’S&P 500. Per i test storici usa la composizione effettiva del mese analizzato.
+2. Per ogni titolo calcola la variazione percentuale del prezzo secondo la finestra 9‑1, escludendo interamente il mese appena concluso. Ordina i titoli dal rendimento più alto al più basso. La graduatoria è relativa e vale anche quando i migliori rendimenti sono negativi.
+3. Alla prima selezione acquista i primi quattro titoli. Assegna a ciascuno il 25% del capitale destinato alla strategia, calcolato sul controvalore della posizione.
+4. Nei mesi successivi verifica prima i titoli già posseduti. Dal 1° all’8° posto incluso, mantieni. Dal 9° posto in poi, vendi. Per ogni posto liberato acquista il titolo più alto in classifica tra quelli che ancora non possiedi, fino a tornare a quattro. Se tutti e quattro restano nei primi otto, mantieni gli stessi nomi anche se in testa alla classifica compaiono nuovi titoli.
+5. Ripeti la procedura una sola volta per mese. La vendita prevista dalla strategia chiude una posizione long. Le sole condizioni di selezione, mantenimento e uscita sono quelle sopra descritte.
+
+Tre dettagli da confermare con me
+
+Riunisci queste domande in un solo messaggio. Puoi intanto implementare la parte comune del bot.
+
+- Finestra 9‑1. Se il segnale viene calcolato a fine ottobre, la chiusura finale è quella di settembre. Chiedimi se la chiusura iniziale è quella di gennaio (otto mesi effettivi di rendimento) oppure del dicembre precedente (nove mesi interi prima di ottobre). Applica poi 100 × (chiusura finale / chiusura iniziale − 1) usando chiusure confrontabili anche in presenza di frazionamenti azionari.
+- Pesi dopo il primo mese. Chiedimi se riportare tutti e quattro i titoli al 25% a ogni ribilanciamento oppure lasciare oscillare i pesi dei titoli mantenuti. Nel secondo caso chiarisci come distribuire il capitale liberato dalle vendite.
+- Esecuzione. La classifica nasce a mercato chiuso. Chiedimi se inviare gli ordini alla prima apertura ordinaria USA successiva o in un altro momento da me indicato. Nel backtest usa prezzi disponibili al momento di esecuzione concordato.
+
+Requisiti MT5
+
+L’EA deve funzionare da un solo grafico. Associa i componenti dell’indice ai simboli del broker e verifica la copertura dell’intero universo. Se dati mancanti, parità in classifica, uscita dall’indice o indisponibilità di un titolo cambiano un ordine, segnala il caso preciso e chiedi come trattarlo. Calcola i volumi rispettando valuta, dimensione del contratto e quantità negoziabili.
+
+Registra per ogni mese le date dei prezzi usati, i rendimenti, le posizioni in classifica e il motivo di ogni acquisto, mantenimento o vendita. Dopo un riavvio o un’esecuzione parziale, riconcilia ordini e posizioni dell’EA prima di completare il ribilanciamento, evitando duplicati.
+
+Verifica del bot e del win rate
+
+Verifica questo caso concreto. Se i quattro titoli posseduti diventano 2°, 5°, 8° e 9°, deve uscire solo il 9° ed entrare il 1°. Il portafoglio risultante deve contenere 1°, 2°, 5° e 8°.
+
+Il mio obiettivo è un win rate minimo del 70%, preferibilmente del 75–80%. Prima del test conferma con me il periodo e la definizione di vittoria. Come metrica propongo la percentuale di posizioni chiuse con profitto netto sul totale delle posizioni chiuse, contando per ciascun titolo l’intero ciclo dal primo acquisto all’uscita completa. Le vendite parziali di ribilanciamento fanno parte dello stesso ciclo.
+
+Compila il sorgente con MetaEditor se disponibile e correggi gli errori rilevati. Se puoi eseguire il backtest nello Strategy Tester, riporta periodo, costi considerati, numero di posizioni vincenti, totale chiuso e win rate osservato. Se risulta inferiore al 70%, dichiaralo e conserva le regole originali. Alla consegna indica dove hai salvato il file, quali verifiche hai eseguito e quali dati servono per ripetere il test.

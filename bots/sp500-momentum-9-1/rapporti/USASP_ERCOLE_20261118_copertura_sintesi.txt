@@ -1,0 +1,10 @@
+RAPPORTO DI COPERTURA USAS&P_ERCOLE (finestra 9-1: chiusura fine t-9 -> chiusura fine t-1)
+Composizione nel file: dal 1996.01.02 al 2026.08.18 (considerata valida fino a +45 giorni)
+Calendario (AAPL): storico D1 dal 2003.09.30
+Mesi di segnale analizzati: 1996-01 .. 2026-10 (370), con composizione e calendario: 268
+Mesi con copertura prezzi COMPLETA: 0 -> nessuno
+Primo mese indeterminato partendo dal primo mese valido: 2004-06
+Periodo più lungo senza mesi indeterminati (partenza a portafoglio vuoto): - .. - (0 mesi di segnale)
+Ticker con storico: 731; simboli assenti: 478; storico non disponibile: 0
+Dettagli: USASP_ERCOLE_20261118_copertura_mesi.csv (esito per mese) e USASP_ERCOLE_20261118_copertura_mancanti.csv (titolo e prezzo mancante)
+Nota: la negoziabilità storica non è verificabile qui; un salto da split non verificato rende il titolo non classificabile.

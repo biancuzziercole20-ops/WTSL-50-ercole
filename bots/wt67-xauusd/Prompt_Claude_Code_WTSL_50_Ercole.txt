@@ -1,0 +1,42 @@
+Lavora nel repository corrente come sviluppatore MQL5. Crea e verifica un Expert Advisor per MetaTrader 5 sui miei conti FTMO da 100.000 e 50.000. Scrivi il sorgente completo nel file WTSL-50%ercole.mq5, con trattino, segno % e minuscole esattamente come indicati. Mostra WTSL-50%ercole anche sul grafico e nei messaggi di avvio. Usa la cartella Experts del progetto, oppure MQL5/Experts/ se devi crearla.
+
+1. File di partenza e ruoli
+
+Leggi per intero WT67ercole.mq5 e WT67_Collegamento_50k.mq5. Il primo definisce la strategia che opera sul 100k. Usa il secondo come base del nuovo file e conserva la compatibilità con le posizioni e le ricevute già registrate. Mantieni disponibili entrambi i sorgenti originali.
+
+Il nuovo EA gira in due terminali MT5 dello stesso utente Windows, sullo stesso PC o VPS. Usa FILE_COMMON per comunicare. Gli input sono InpConto100k, InpConto50k, InpMagic100k=670067 e InpMagic50k=670050. Ricava il ruolo dal login attivo. I due numeri conto si impostano localmente in MT5.
+
+Sul 100k il nuovo EA osserva le posizioni effettivamente aperte dal WT67 originale su XAUUSD. Il WT67 usa il WaveTrend LazyBear 10/21/4. Su due candele M15 chiuse, il BUY richiede WT1 precedente ≤ WT2 precedente e WT1 attuale > WT2 attuale. Il SELL richiede WT1 precedente ≥ WT2 precedente e WT1 attuale < WT2 attuale. I valori originali sono 1,00 lotto e SL/TP a 10,00 unità di prezzo. Il 50k segue esclusivamente l’operazione effettivamente aperta dal 100k, nella stessa direzione.
+
+2. Condizioni di apertura sul 50k
+
+Valuta l’ingresso su tick anche durante la candela M15. Tutte le condizioni seguenti devono essere vere nello stesso momento.
+
+- La posizione sorgente è ancora aperta, ha il Magic Number previsto e ha SL e TP validi.
+- Per un BUY, ingresso effettivo 100k meno Bid 100k è almeno 5,00. Per un SELL, Ask 100k meno ingresso effettivo 100k è almeno 5,00. Sono 5,00 unità della quotazione dell’oro, per esempio da 3.000,00 a 2.995,00.
+- Il profitto flottante della singola posizione sorgente, letto da POSITION_PROFIT, è minore o uguale a −500 nella valuta del 100k. La soglia è lo 0,5% dei 100.000 nominali.
+- Sul 50k il volume è fisso a 0,50 lotti. Usa Ask per acquistare e Bid per vendere. Passa a OrderCalcProfit il prezzo eseguibile, il volume e, separatamente, i prezzi assoluti di SL e TP presi dal 100k. Autorizza l’ordine solo se le due stime lorde nella valuta del 50k corrispondono a −250 e +750, alla precisione del centesimo.
+- Le nuove aperture sono consentite dalle 15:30 incluse alle 17:30 escluse, ora Europe/Rome con ora legale automatica. Anche il trade sorgente deve appartenere alla sessione italiana corrente. Una sola posizione del bot aperta per volta, massimo quattro aperture per giorno italiano e una sola copia per posizione sorgente.
+
+Se spread o gap fanno saltare il prezzo utile, attendi un eventuale ritorno e ricontrolla tutte le condizioni e la freschezza dei due feed subito prima dell’invio. Se il 100k è già uscito, scarta l’ingresso. Verifica griglia dei prezzi, passo dei lotti e distanza minima degli stop. Invia un ordine a mercato per l’intero volume con Fill or Kill, con gli stessi prezzi di SL e TP già nella richiesta. Se il broker non supporta l’esecuzione integrale o quei livelli, registra il motivo e salta l’ordine. Le cifre −250/+750 sono stime lorde. Commissioni, swap, slippage o un’uscita anticipata possono cambiare il risultato realizzato.
+
+3. Gestione delle posizioni e dei riavvii
+
+Conferma dal 100k ogni chiusura o inversione. Se la copia è ancora aperta, chiudila anche fuori orario. Un nuovo trade opposto deve maturare la propria perdita di 5,00 e superare tutti i controlli. Se cambia una protezione sul 100k, sincronizza il nuovo prezzo valido sul 50k. Durante una disconnessione conserva le protezioni già al broker e sospendi le nuove entrate.
+
+Usa POSITION_IDENTIFIER, conto e direzione per riconoscere il trade. Conserva su disco l’associazione con la copia e l’intenzione di invio prima di trasmettere l’ordine. Controlla il retcode e riconcilia posizioni, ordini e storico prima di ritentare dopo un timeout o un riavvio. Proteggi anche dal doppio avvio su due grafici e dalla fusione con posizioni estranee sui conti netting. Nel log Experts indica il motivo di ogni apertura, attesa rilevante o rifiuto, i prezzi utilizzati e il risultato del broker.
+
+4. Test di accettazione
+
+Usa per gli esempi conti in USD e un contratto XAUUSD da 100 once per lotto.
+
+- BUY. Il 100k compra a 3000 con SL 2990 e TP 3010. Con Bid 100k a 2995, P/L −500 e Ask 50k a 2995, il 50k deve comprare 0,50 con SL 2990 e TP 3010. Attesi −250/+750 lordi.
+- SELL. Il 100k vende a 3000 con SL 3010 e TP 2990. Con Ask 100k a 3005, P/L −500 e Bid 50k a 3005, il 50k deve vendere 0,50 con SL 3010 e TP 2990. Attesi −250/+750 lordi.
+- Spread. Ripeti il BUY con Ask 50k a 2995,20. I risultati teorici diventano −260/+740. Atteso zero ordini. Se l’Ask torna a 2995 e tutte le condizioni sono ancora valide, è ammessa una sola apertura.
+- Verifica anche movimento avverso di 4,99, perdita di soli 499, chiusura prima dell’ingresso, fonte scollegata, riavvio dopo un ordine, inversione, quinto trade giornaliero e confini orari 15:29:59, 15:30:00 e 17:30:00 sia in estate sia in inverno.
+
+5. Esecuzione e consegna
+
+Scrivi il codice e avvia i test disponibili. Se hai MetaEditor, compila il file, correggi gli errori e riporta il log finale con il numero effettivo di errori e avvisi. Consegna WTSL-50%ercole.ex5 solo se generato dal compilatore. Se MetaEditor è assente, consegna comunque il .mq5, esegui le prove logiche disponibili e indica come compilare con F7. Distingui sempre i test con dati simulati da una prova completa su due terminali demo. Una singola istanza dello Strategy Tester verifica soltanto ciò che è stato effettivamente simulato.
+
+Chiudi con il percorso del sorgente, i test eseguiti con esito atteso e osservato, e le istruzioni per installare la nuova versione su un secondo grafico XAUUSD del 100k e come unico ricevitore sul 50k. Esegui le prove su dati simulati o conti demo. L’attivazione sulla prop avverrà separatamente.

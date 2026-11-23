@@ -1,0 +1,33 @@
+﻿S&P 500 | Verifica del segnale del 30 settembre 2026
+
+RISULTATO
+La composizione aggiornata comprende 503 titoli. Ho confrontato la chiusura del 31 dicembre 2025 con quella del 31 agosto 2026. Settembre è il mese di segnale e resta fuori dal calcolo del momentum 9−1.
+
+Per 501 titoli sono disponibili entrambe le chiusure. FedEx Freight (FDXF) e Honeywell Aerospace (HONA) hanno iniziato a quotare separatamente nel giugno 2026. Nel calcolo di riferimento ogni titolo diventa classificabile quando ha entrambe le chiusure. Questa ipotesi va confermata per la strategia.
+
+Da portafoglio vuoto i primi quattro sono SNDK, MRNA, DELL e MU. Le variazioni di prezzo misurano il periodo precedente alla selezione. Se invece al 30 settembre detenevi già STX, WDC, MU e LITE, i loro piazzamenti sono rispettivamente 5°, 6°, 4° e 8°. Con la regola di mantenimento nei primi otto restano tutti in portafoglio. Il rapporto precedente di MT5 segnalava come incerto il percorso con cui si era arrivati a quei titoli.
+
+RIPRODUCI IL CONTROLLO SUL CONTO DEMO
+1. Estrai lo ZIP sul PC. Apri la cartella Per_MT5 e copia i due file CSV.
+2. Premi i tasti Windows e R insieme. Incolla %APPDATA%\MetaQuotes\Terminal\Common\Files e premi Invio. Incolla qui i due CSV.
+3. Apri il grafico AAPL, Daily, del conto MetaQuotes-Demo con USASP_ERCOLE già applicato. Premi F7, apri Dati in ingresso, scegli Carica e seleziona il file Settembre_2026.set estratto dallo ZIP.
+4. Prima di confermare con OK, verifica a video la modalità «Solo rapporto di copertura dati (nessun ordine)», il primo mese 01/09/2026 e l’ultimo mese 30/09/2026. Se la tua installazione richiede le date nel selettore, inseriscile nei due campi [Copertura]. Il file composizione deve chiamarsi sp500_2026_09_30.csv e quello degli split split_verificati_settembre_2026.csv.
+5. Nella scheda Experts compariranno il messaggio con 503 ticker e il periodo da 2026-09 a 2026-09. Tieni aperto MT5 fino a RAPPORTO DI COPERTURA. La velocità dipende dallo storico già presente nel terminale. Il nuovo rapporto avrà il prefisso USASP_ERCOLE_20260930. I file copertura_mesi.csv, copertura_mancanti.csv e copertura_sintesi.txt con quel prefisso si trovano nella stessa cartella Common\Files.
+
+NELLO ZIP
+• Risultati/classifica_settembre_2026.csv contiene la verifica indipendente e le fonti per ogni riga. Si apre con Excel o Calc usando il punto e virgola come separatore e la virgola decimale italiana. L’EA continua a usare lo storico del broker, quindi alcuni simboli possono ancora risultare mancanti in MT5.
+• Per_MT5/sp500_2026_09_30.csv contiene la sola fotografia dei componenti al 30 settembre. Il preset usa questa fotografia per limitare la scansione al singolo mese e ai 503 titoli.
+• Per_MT5/split_verificati_settembre_2026.csv contiene i sette frazionamenti o raggruppamenti documentati che corrispondono a salti segnalati dal tuo rapporto nella finestra di settembre. Date e fattori seguono il formato del tuo EA.
+• Archivio/sp500_storico_con_variazione_2026-09-21.csv conserva tutte le 2.720 righe del file originale e aggiunge la variazione con la sua data di efficacia. È verificato per l’uso di settembre 2026. Per i mesi successivi occorrono le variazioni successive dell’indice.
+
+COME LEGGERE LA CLASSIFICA
+La composizione deriva dall’ultimo elenco del tuo file, datato 18 agosto, aggiornato con gli ingressi di BE, ILMN e P e le uscite di TAP, BLDR e TTD, efficaci prima dell’apertura del 21 settembre. Il segnale di fine settembre si riferisce alla prima seduta ordinaria successiva, il 1 ottobre.
+
+Per i titoli presenti nei prospetti dei fondi indicizzati del 31 dicembre e del 31 agosto, il prezzo si ricava dal valore in dollari della posizione diviso per il numero di azioni, arrotondato al centesimo. I collegamenti per le chiusure e gli eventi societari compaiono nelle rispettive colonne del CSV. Per gli altri titoli ho usato serie di prezzi di chiusura pubbliche. Nel collegamento fra le date ho seguito il titolo e la sua classe anche quando è cambiato il ticker.
+
+Variazione percentuale = 100 × (chiusura di agosto × fattore di split / chiusura di dicembre − 1). La misura esclude dividendi e valore di eventuali titoli distribuiti per scorporo. Riguarda le azioni osservate prima del segnale. Per misurare rendimento o win rate della strategia servono le esecuzioni e i cicli chiusi in un backtest con dati adeguati. Il rapporto inviato registrava zero operazioni.
+
+Fonti della composizione e dei prospetti
+https://press.spglobal.com/2026-09-04-Bloom-Energy,-Illumina,-and-Everpure-Set-to-Join-S-P-500-Others-to-Join-S-P-100,-S-P-MidCap-400,-and-S-P-SmallCap-600
+https://www.sec.gov/Archives/edgar/data/916053/000141036826019518/NPORT_ITOC_92773861_1225.htm
+https://www.sec.gov/Archives/edgar/data/826686/000119312526448951/d186902dncsr.htm

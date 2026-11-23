@@ -1,0 +1,6 @@
+Decisione congelata il 2026-11-22 19:13 UTC, PRIMA di eseguire qualsiasi test su 2026-01..2026-10.
+Regola: variante con win rate netto >= 80%, risultato medio netto > 0 e perdite ridotte vs originale nel 2025 (dettaglio 1m).
+Esito 2025: nessuna configurazione soddisfa la regola (originale 66,7%, SL15 66,7% identica, SL10 57,8%).
+Candidata congelata per la verifica: binance_sl15 (identica all'originale nel 2025, limita la coda di perdita).
+Parametri congelati: tutti i default di binance.py, stoploss fisso -15% dal prezzo d'ingresso, InpReplicateTagQuirk attivo.
+Per trasparenza nel 2026 vengono eseguite tutte e tre le configurazioni, ma la scelta non cambia.

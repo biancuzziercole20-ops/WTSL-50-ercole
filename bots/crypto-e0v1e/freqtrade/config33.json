@@ -1,0 +1,67 @@
+{
+ "max_open_trades": 10,
+ "stake_currency": "USDT",
+ "stake_amount": 100,
+ "dry_run": true,
+ "dry_run_wallet": 1000,
+ "trading_mode": "spot",
+ "timeframe": "5m",
+ "fee": 0.001,
+ "entry_pricing": {
+  "price_side": "other",
+  "use_order_book": false
+ },
+ "exit_pricing": {
+  "price_side": "other",
+  "use_order_book": false
+ },
+ "exchange": {
+  "name": "binance",
+  "key": "",
+  "secret": "",
+  "pair_whitelist": [
+   "BTC/USDT",
+   "ETH/USDT",
+   "BNB/USDT",
+   "SOL/USDT",
+   "XRP/USDT",
+   "ADA/USDT",
+   "DOGE/USDT",
+   "TRX/USDT",
+   "AVAX/USDT",
+   "LINK/USDT",
+   "DOT/USDT",
+   "POL/USDT",
+   "LTC/USDT",
+   "BCH/USDT",
+   "UNI/USDT",
+   "XLM/USDT",
+   "ATOM/USDT",
+   "ETC/USDT",
+   "FIL/USDT",
+   "APT/USDT",
+   "ICP/USDT",
+   "HBAR/USDT",
+   "VET/USDT",
+   "ARB/USDT",
+   "OP/USDT",
+   "AAVE/USDT",
+   "INJ/USDT",
+   "CRV/USDT",
+   "SNX/USDT",
+   "COMP/USDT",
+   "SUI/USDT",
+   "NEAR/USDT",
+   "SEI/USDT"
+  ],
+  "pair_blacklist": []
+ },
+ "pairlists": [
+  {
+   "method": "StaticPairList"
+  }
+ ],
+ "dataformat_ohlcv": "feather",
+ "user_data_dir": "user_data",
+ "internals": {}
+}

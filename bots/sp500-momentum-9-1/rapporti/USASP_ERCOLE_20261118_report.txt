@@ -1,0 +1,10 @@
+[OnDeinit] USAS&P_ERCOLE
+Ribilanciamenti eseguiti: segnali da - a -
+Finestra: chiusura fine t-9 -> chiusura fine t-1 (8 mesi effettivi)
+Esecuzione: prima apertura ordinaria USA successiva al segnale (09:30 New York = 16:30 server alla data corrente), primo prezzo effettivamente negoziabile da quell'istante
+Pesi: (c) residuo ai nuovi | Capitale: 100.0% equity
+Costi registrati nei deal: commissioni 0.00, swap 0.00, fee 0.00 (0 deal)
+Cicli chiusi 0, vincenti 0, win rate 0.00% (obiettivo >= 70%: NON raggiunto)
+Profitto netto dei cicli chiusi 0.00. Cicli ancora aperti (esclusi dal win rate) 0.
+Mesi sospesi 0: 
+Ribilanciamenti eseguiti dopo il primo mese sospeso (portafoglio dipendente da un mese indeterminato): 0

@@ -1,0 +1,15 @@
+[
+  {
+    "listing_id": "manual-example-001",
+    "url": "https://www.vinted.it/items/ESEMPIO-sostituisci-con-url-reale",
+    "title": "Charizard ex 199/165 Obsidian Flames",
+    "description": "Descrizione copiata manualmente dall'annuncio reale, condizioni near mint.",
+    "price": 25.0,
+    "currency": "EUR",
+    "images": ["https://images.vinted.net/ESEMPIO.jpg"],
+    "seller": "nome_venditore",
+    "country": "IT",
+    "language": "Italian",
+    "posted_at": "2026-09-18T07:30:00Z"
+  }
+]

@@ -1,0 +1,43 @@
+Claude, ti chiedo di trasformare questa strategia swing in una specifica per un Expert Advisor di MetaTrader 5 e per il suo backtest. Il mensile individua la zona di lavoro. Il grafico a quattro ore (H4) serve per leggere i volumi, riconoscere il pattern e decidere l’ingresso. TradingView è il riferimento visivo degli esempi. MT5 può gestire le operazioni con un broker compatibile che offra gli strumenti scelti. Pepperstone è quello citato nel materiale.
+
+1. Come costruisco i livelli mensili
+
+Scelgo una candela mensile che mostri una presa di controllo da parte dei compratori o dei venditori. Per giudicare la forza osservo corpo e ombre (spike). Negli esempi la candela è già chiusa quando comincio a usarla. Una mensile precedente può restare il riferimento per più mesi, come nel caso AVGO. Il criterio numerico di forza e la regola per sostituirla restano da definire.
+
+Segno il minimo L, il massimo H e l’equilibrio E = (H + L) / 2. H e L comprendono entrambe le ombre. Fra L ed E c’è la metà bassa del range (discount), fra E e H la metà alta (premium). E è un riferimento di prezzo. Per scegliere il verso dell’operazione osservo cosa succede in quella zona. All’interno del range di una mensile rialzista posso osservare prima una discesa verso l’equilibrio e poi una ripartenza. La frase degli appunti sul comprare a premium e vendere a sconto va letta insieme agli esempi. Su AVGO l’ingresso long è disegnato in discount, quindi va lasciata aperta l’esistenza di un vincolo valido per tutti gli ingressi.
+
+2. Come leggo il Volume Profile
+
+Sul grafico H4 uso il Fixed Range Volume Profile di TradingView con 24 tick per riga. Ogni fascia di prezzo del profilo è alta 24 incrementi minimi di prezzo dello strumento. Il POC è la fascia che concentra più volume nell’intervallo selezionato. L’equilibrio mensile si calcola invece dai due estremi di prezzo.
+
+Confronto dove si concentra il volume durante fasi successive e come reagisce il prezzo in quelle aree. Su AVGO il trader descrive il volume prima nella parte alta, poi nella parte bassa del range, insieme a una presa di liquidità sotto il minimo. Per automatizzare questa lettura restano da stabilire le barre esatte fra cui tracciare ciascun profilo e l’eventuale posizione del POC necessaria per entrare. Nella prima verifica si possono annotare gli ancoraggi a mano. Se il segnale nasce su TradingView, il profilo di riferimento resta quello del grafico scelto anche cambiando broker di esecuzione. Se lo ricostruisci su MT5, confronta simbolo, fonte dei dati, tipo di volume e intervallo usato. La stessa impostazione a 24 tick può dare profili diversi su dati diversi.
+
+3. Dal contesto al segnale H4
+
+In una zona mensile di interesse cerco un rounding con rottura di momentum, oppure una base di accumulo seguita da rottura. Visivamente il rounding ha una forma arrotondata, con la spinta precedente che si esaurisce e il movimento opposto che prende forza. Per il long cerco la ripresa dei compratori e la rottura rialzista della struttura individuata. Nel caso short mostrato, il prezzo distribuisce in alto e poi rompe al ribasso. Leggo insieme profilo dei volumi e cambio di momentum per individuare il segnale. Il livello della struttura H4 da rompere va identificato sul grafico prima della rottura. Il trader richiama anche lo schema AMD (accumulo, manipolazione, distribuzione). La presa di liquidità è documentata nel caso AVGO. La sua obbligatorietà per ogni ingresso resta da stabilire.
+
+Il trader osserva le chiusure H4. Il materiale lascia aperto se la rottura richieda una chiusura oltre il livello, quanto debba essere ampio il corpo, se l’ordine parta sulla rottura o sul retest, e quando il setup scada. Per il primo replay, registra separatamente la candela di conferma e il primo prezzo d’ingresso utilizzabile. Qualunque soglia proposta per rendere automatico il riconoscimento del rounding o dell’accumulo è un’ipotesi da testare.
+
+4. Due esempi che la specifica deve saper spiegare
+
+AVGO (Broadcom), long. La mensile di riferimento ha minimo 302,28, massimo 429,56 ed equilibrio 365,92. Il trader osserva una presa di liquidità sotto il minimo e una reazione dei compratori. Nel disegno l’ingresso è a 328,67, quindi ancora sotto l’equilibrio. Lo stop è a 290,67 e il target a 404,13. La distanza ingresso-stop è 38,00 e quella ingresso-target è 75,46, circa 1,99R. Applicando 2R esatti a ingresso e stop disegnati si ottiene 404,67. Questi sono livelli del piano illustrato. Nello scenario alternativo il trader scarta il long perché il prezzo prosegue al ribasso dopo aver perso il minimo. È la reazione successiva alla presa di liquidità a distinguere i due casi.
+
+Esempio con due direzioni. Una mensile chiude mostrando forza dei compratori. Il mese seguente apre vicino ai massimi precedenti. Il prezzo distribuisce sopra quei massimi e scende verso la zona di equilibrio. Questa è la gamba short descritta. In zona di equilibrio i compratori riprendono il controllo e si sviluppa la gamba long. Sono due opportunità da valutare ciascuna sul proprio segnale H4. L’arrivo al 50% da solo non dà l’ordine di invertire la posizione.
+
+5. Invalidazione, obiettivo e rischio
+
+Per il long il livello di invalidazione indicato è il minimo del pattern H4. Per lo short il massimo del pattern è la mia ipotesi simmetrica per il test. L’eventuale margine oltre l’estremo, gli spostamenti dello stop e i rientri dopo uno stop restano aperti.
+
+Il rapporto rischio/rendimento è 1:2. Indicando con P il prezzo d’ingresso e con S lo stop iniziale, la distanza di rischio è R = |P − S|. Il target è P + 2R per un long e P − 2R per uno short. Se riconosco un pattern d’inversione posso chiudere manualmente prima del target. La quota da chiudere e una definizione automatica dell’inversione non sono specificate.
+
+Il rischio previsto per operazione è 0,25% oppure 0,50%, scelto in base all’asset e alla confluenza macroeconomica. La macro influisce sulla size. In una prima versione posso selezionare il rischio manualmente prima dell’ingresso. Per il dimensionamento automatico occorre esplicitare se la percentuale si applica al saldo o all’equity e usare le specifiche del simbolo per tradurre la distanza dello stop in perdita monetaria per lotto. Le regole fornite non prevedono altri filtri d’ingresso o d’uscita.
+
+6. Mercati e direzioni
+
+Il bot deve saper gestire long e short. Il trader degli esempi opera in entrambe le direzioni sul Forex e solo long su azioni e indici. AVGO è l’esempio azionario dettagliato. Nello storico compaiono anche PFE, S&P 500 e Nasdaq-100. Le materie prime sono citate fra i mercati osservati, con strumenti e operatività specifica ancora da precisare. Prevedi simboli e direzioni configurabili per mercato. Le diverse operazioni su PFE visibili nello storico non bastano a stabilire se siano ingressi aggiuntivi sullo stesso pattern. Il limite di posizioni contemporanee e di segnali ripetuti rimane aperto.
+
+7. Il risultato che ti chiedo
+
+• Scrivi in ordine temporale come riconosceresti un long, uno short e un setup da scartare. Usa AVGO per verificare i calcoli e per controllare che la tua descrizione ammetta un long sotto il 50%.
+• Prepara una tabella che distingua regole confermate, osservazioni tratte da un esempio e ipotesi per il codice. Per forza mensile, profilo e rottura indica cosa dovrebbe segnare una persona e cosa può misurare l’EA. Se proponi una regola quantitativa, dichiarala come variante.
+• Fornisci uno pseudocodice per MT5 e un piano di backtest. Nel primo test si possono segnare in replay candela mensile, ancoraggi del profilo, pattern, livello da rompere, invalidazione e rischio, usando solo i dati già visibili in quel momento. Sugli stessi ingressi confronta l’uscita meccanica stop/2R con le eventuali uscite manuali effettivamente annotate. Distingui il risultato teorico in R da quello dopo spread, commissioni e altri costi applicabili. Negli screenshot i tre mesi di conto comprendono anche altri timeframe. Il periodo del nuovo test è da scegliere e il rendimento della strategia mensile resta da misurare.
