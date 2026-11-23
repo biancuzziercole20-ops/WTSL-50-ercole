@@ -1,0 +1,2 @@
+id;tipo;stato_annotazione;annotato_il_utc;simbolo_tv;simbolo_mt5;classe;lato;mese_rif;M_H;M_L;EQ;frvp_da_utc;frvp_a_utc;poc_tv;pattern;sweep_utc;estremo_pattern;livello_trigger;entry_utc;entry_prezzo;entry_modo_dichiarato;stop;target;rischio_pct;confluenza_macro;uscita_utc;uscita_prezzo;uscita_tipo;uscita_motivo;screenshot;note
+AVGO-001;TRADE;DA_CONFERMARE;;NASDAQ:AVGO;AVGO.US;AZIONI;LONG;;429.56;302.28;365.92;;;;;;;;;328.67;NON_SO;290.67;404.13;;;;;;;;Esempio della specifica: target disegnato = 1.986R, 2R esatto = 404.67, estremo del pattern presunto = stop
