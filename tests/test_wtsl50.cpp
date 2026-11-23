@@ -17,6 +17,10 @@ struct EA {
 #include "ea_body.inc"
 };
 
+struct WT67EA {
+#include "wt67_body.inc"
+};
+
 namespace fs = std::filesystem;
 static string g_base;
 static const long L100 = 11000001;
@@ -62,7 +66,30 @@ struct Env {
     T100.bid = T50.bid = 2999.70; T100.ask = T50.ask = 3000.00;
     T100.tick_time_server = T50.tick_time_server = g_utc_ms / 1000 + srv * 3600;
   }
-  ~Env() { delete ea100; delete ea50; }
+  ~Env() { delete ea100; delete ea50; delete wt; }
+  // ---- bot WT67 sul terminale 100k e barre M15 sintetiche
+  WT67EA* wt = nullptr;
+  std::vector<MqlRates> serie;
+  long t0 = 0;   // ora server di apertura della barra 0 della serie
+  int StartWT() { wt = new WT67EA(); wt->InpConto100k = L100; g_term = &T100; return wt->OnInit(); }
+  void RestartWT() { g_term = &T100; wt->OnDeinit(0); delete wt; wt = nullptr; StartWT(); }
+  // La barra "idx" della serie apre alle romeH:romeM ora di Roma dello stesso giorno.
+  void Serie(const std::vector<MqlRates>& s, int idx, int romeH, int romeM) {
+    serie = s;
+    long giorno = (g_utc_ms / 86400000L) * 86400L;
+    long utc = giorno + (romeH - romeOff) * 3600L + romeM * 60L;
+    t0 = utc + T100.server_offset - (long)idx * 900;
+  }
+  void VaiABarra(int j, int sec) {
+    long target = (t0 + (long)j * 900 + sec - T100.server_offset) * 1000L;
+    if (target > g_utc_ms) Adv(target - g_utc_ms);
+    T100.m15.clear();
+    for (int i = 0; i <= j; i++) { MqlRates r = serie[i]; r.time = t0 + (long)i * 900; T100.m15.push_back(r); }
+  }
+  void TickBarra(int j, int sec, double b100, double a100, double b50, double a50) { VaiABarra(j, sec); Q100(b100, a100); Q50(b50, a50); }
+  int OpensWT() const { int n = 0; for (auto& r : T100.sent) if (r.action == TRADE_ACTION_DEAL && r.position == 0) n++; return n; }
+  int ClosesWT() const { int n = 0; for (auto& r : T100.sent) if (r.action == TRADE_ACTION_DEAL && r.position != 0) n++; return n; }
+  const MockPosition* PosWT() const { for (auto& p : T100.positions) if (p.magic == MAGIC_WT67) return &p; return nullptr; }
   EA* Make() { EA* e = new EA(); e->InpConto100k = L100; e->InpConto50k = L50; return e; }
   int Start100() { ea100 = Make(); g_term = &T100; return ea100->OnInit(); }
   int Start50() { ea50 = Make(); g_term = &T50; return ea50->OnInit(); }
@@ -77,6 +104,7 @@ struct Env {
   void Q100(double bid, double ask) {
     T100.bid = bid; T100.ask = ask; T100.tick_time_server = g_utc_ms / 1000 + T100.server_offset;
     g_term = &T100; BrokerCheckStops(T100);
+    if (wt) wt->OnTick();
     if (ea100) ea100->OnTick();
   }
   void Q50(double bid, double ask) {
@@ -185,6 +213,8 @@ static long ApriCopiaBuy(Env& e) {
   e.Tick(2995.00, 2995.30, 2994.70, 2995.00);
   return src;
 }
+
+#include "test_wt67.inc"
 
 int main(int argc, char** argv) {
   g_base = argc > 1 ? argv[1] : "build/work";
@@ -807,15 +837,19 @@ int main(int argc, char** argv) {
           std::to_string(allargato) + " ordini con spread allargato, " + std::to_string(e.Opens()) + " dopo", ok);
   }
 
+  TestWT67();
+
   int ok = 0, ko = 0;
   for (auto& r : g_righe) (r.ok ? ok : ko)++;
   std::cout << "\nRisultato: " << ok << " OK, " << ko << " falliti\n";
   if (!report.empty()) {
     std::ofstream o(report);
-    o << "# Risultati dei test simulati di WTSL-50%ercole.mq5\n\n";
+    o << "# Risultati dei test simulati di WT67ercole.mq5 e WTSL-50%ercole.mq5\n\n";
     o << "Generato da `tests/run_tests.sh`. Prove **simulate**: il sorgente `.mq5` reale e' compilato con g++ su un simulatore "
          "dell'API MT5 (`tests/mt5_shim.h`) con due conti finti in USD, XAUUSD a 2 decimali e contratto da 100 once. "
-         "Non sono prove su terminali MetaTrader 5.\n\n";
+         "Non sono prove su terminali MetaTrader 5.\n\n"
+         "Serie T: WTSL-50%ercole (sorgente 100k e ricevitore 50k). Serie W: WT67ercole (strategia 100k) su candele M15 sintetiche. "
+         "E01: i tre EA insieme, dall'incrocio WaveTrend alla copia sul 50k e alla chiusura sull'incrocio opposto.\n\n";
     o << "Esito complessivo: **" << ok << " OK, " << ko << " falliti**\n\n";
     o << "| ID | Prova | Risultato atteso | Risultato osservato | Esito |\n|---|---|---|---|---|\n";
     for (auto& r : g_righe) {

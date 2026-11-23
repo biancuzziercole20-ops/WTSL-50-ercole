@@ -1,8 +1,10 @@
-# Risultati dei test simulati di WTSL-50%ercole.mq5
+# Risultati dei test simulati di WT67ercole.mq5 e WTSL-50%ercole.mq5
 
 Generato da `tests/run_tests.sh`. Prove **simulate**: il sorgente `.mq5` reale e' compilato con g++ su un simulatore dell'API MT5 (`tests/mt5_shim.h`) con due conti finti in USD, XAUUSD a 2 decimali e contratto da 100 once. Non sono prove su terminali MetaTrader 5.
 
-Esito complessivo: **42 OK, 0 falliti**
+Serie T: WTSL-50%ercole (sorgente 100k e ricevitore 50k). Serie W: WT67ercole (strategia 100k) su candele M15 sintetiche. E01: i tre EA insieme, dall'incrocio WaveTrend alla copia sul 50k e alla chiusura sull'incrocio opposto.
+
+Esito complessivo: **58 OK, 0 falliti**
 
 | ID | Prova | Risultato atteso | Risultato osservato | Esito |
 |---|---|---|---|---|
@@ -48,3 +50,19 @@ Esito complessivo: **42 OK, 0 falliti**
 | T16 | WaveTrend 10/21/4 dell'EA contro due implementazioni indipendenti (C++ e pandas) | stessi valori e stessi incroci | scarto massimo C++ 0.00e+00; pandas: OK scarto massimo 1.05e-10, incroci rialzisti 20, ribassisti 19, coincidono: si | OK |
 | T17 | Il 100k chiude il trade tra il primo controllo e la verifica finale prima dell'invio | 0 ordini | 0 ordini, bloccato dalla verifica finale | OK |
 | T17b | L'Ask del 50k passa da 2995.00 a 2995.20 durante la verifica finale | 0 ordini in quell'istante; 1 al ritorno a 2995.00 | 0 ordini con spread allargato, 1 dopo | OK |
+| W01 | WT67: incrocio rialzista confermato sulla M15 chiusa delle 15:30, prima quotazione alle 15:45:01 | BUY 1.00 @3000.00 (Ask) SL 2990.00 TP 3010.00 magic 670067; nulla prima della chiusura della candela | 1 ordine: BUY 1.00 @3000.00 SL 2990.00 TP 3010.00 magic 670067; prima della chiusura: 0 | OK |
+| W02 | WT67: incrocio ribassista confermato | SELL 1.00 @3000.00 (Bid) SL 3010.00 TP 2990.00 | 1 ordine: SELL 1.00 @3000.00 SL 3010.00 TP 2990.00 magic 670067 | OK |
+| W03 | WT67: prima quotazione della candela alle 17:30:00 esatte e alle 15:30:00 | 0 ordini alle 17:30:00; 1 ordine alle 15:30:00 | 0 alle 17:30, 1 alle 15:30 | OK |
+| W03c | WT67: ora solare (gennaio), ingresso alle 15:30:00 | 1 ordine | 1 ordine | OK |
+| W04 | WT67: nessun incrocio sulla candela chiusa | 0 ordini | 0 ordini | OK |
+| W04b | WT67: incrocio rialzista con un BUY gia' aperto | nessun ordine, una posizione alla volta | 0 aperture, 0 chiusure | OK |
+| W05 | WT67: incrocio con gia' 4 trade nel giorno italiano (controllo con 3) | 0 ordini con 4; 1 ordine con 3 | 0 con 4, 1 con 3 | OK |
+| W06 | WT67: riavvio entro la stessa candela dopo un trade gia' chiuso da SL | nessun secondo ordine sulla stessa candela | 1 ordini totali | OK |
+| W07 | WT67: avviato 120 s dopo l'apertura della candela di segnale | 0 ordini (segnale scaduto, limite 60 s) | 0 ordini | OK |
+| W08 | WT67: eseguito a 3000.20 invece di 3000.00 | SL/TP riallineati a 2990.20 / 3010.20 (10.00 dall'ingresso reale) | ingresso 3000.20, SL 2990.20, TP 3010.20 | OK |
+| W09 | WT67: requote, nuovo tentativo dopo 2 s (e dopo 70 s) | riprova ed entra entro 60 s; dopo 60 s il segnale scade | 2 invii e posizione aperta; con 70 s: 1 invio, posizione assente | OK |
+| W10 | WT67: BUY aperto, poi incrocio ribassista confermato in sessione | BUY chiuso dall'EA (DEAL_REASON_EXPERT) e SELL 1.00 @2993.00 SL 3003.00 TP 2983.00 nello stesso istante | 1 chiusura, 2 aperture, ultima: SELL 1.00 @2993.00 SL 3003.00 TP 2983.00 magic 670067 | OK |
+| W10b | WT67: BUY delle 17:15, incrocio opposto dopo le 17:30 | BUY chiuso anche fuori orario, nessun SELL | 1 chiusura, 1 apertura, posizione nessuna | OK |
+| W11 | WT67 nel Strategy Tester (TimeGMT = ora server, server UTC+3 d'estate) | finestra Europe/Rome rispettata: 1 ordine alle 15:45, 0 alle 17:30:00 | 1 alle 15:45, 0 alle 17:30 | OK |
+| W12 | WT67 caricato per errore sul terminale del conto 50k | non parte (INIT_FAILED) | INIT_FAILED | OK |
+| E01 | Catena completa con 3 EA: WT67 -> WTSL sorgente 100k -> WTSL ricevitore 50k | WT67 BUY @3000; copia BUY 0.50 @2995 a -5/-500; incrocio opposto: WT67 chiude e vende a 2993, copia chiusa; copia SELL @2998 solo alla nuova soglia | incroci sulle barre 100 e 106 (6 candele); WT67 BUY @3000 OK, copia BUY 0.50 @2995 OK, nessun duplicato OK, inversione: chiuse sorgente e copia OK, SELL non copiato a 4.99 OK, copia SELL 0.50 @2998 OK | OK |

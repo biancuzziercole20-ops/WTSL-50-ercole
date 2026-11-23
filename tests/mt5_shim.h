@@ -94,7 +94,7 @@ enum ENUM_TERMINAL_INFO_INTEGER { TERMINAL_CONNECTED, TERMINAL_TRADE_ALLOWED };
 enum ENUM_TERMINAL_INFO_STRING { TERMINAL_COMMONDATA_PATH };
 enum ENUM_MQL_INFO_INTEGER { MQL_TESTER, MQL_TRADE_ALLOWED };
 enum ENUM_SYMBOL_INFO_INTEGER { SYMBOL_DIGITS, SYMBOL_TRADE_MODE, SYMBOL_TRADE_STOPS_LEVEL, SYMBOL_FILLING_MODE };
-enum ENUM_SYMBOL_INFO_DOUBLE { SYMBOL_POINT, SYMBOL_VOLUME_MIN, SYMBOL_VOLUME_MAX, SYMBOL_VOLUME_STEP, SYMBOL_TRADE_CONTRACT_SIZE };
+enum ENUM_SYMBOL_INFO_DOUBLE { SYMBOL_POINT, SYMBOL_VOLUME_MIN, SYMBOL_VOLUME_MAX, SYMBOL_VOLUME_STEP, SYMBOL_TRADE_CONTRACT_SIZE, SYMBOL_TRADE_TICK_SIZE };
 enum ENUM_SYMBOL_TRADE_MODE { SYMBOL_TRADE_MODE_DISABLED = 0, SYMBOL_TRADE_MODE_FULL = 4 };
 
 struct MqlDateTime { int year, mon, day, hour, min, sec, day_of_week, day_of_year; };
@@ -127,6 +127,8 @@ struct MockTerminal {
   bool algo_allowed = true;
   bool hedging = true;
   bool fail_file_writes = false;
+  bool tester = false;           // Strategy Tester: TimeGMT() = ora del server
+  std::map<string, double> gv;   // variabili globali del terminale
   string symbol = "XAUUSD";
   double bid = 0, ask = 0;
   long tick_time_server = 0;
@@ -158,8 +160,8 @@ extern bool g_verbose;
 
 // ------------------------------------------------------------------ tempo
 inline long GetTickCount64() { return g_uptime_ms; }
-inline datetime TimeGMT() { return g_utc_ms / 1000; }
-inline datetime TimeTradeServer() { return TimeGMT() + g_term->server_offset; }
+inline datetime TimeTradeServer() { return g_utc_ms / 1000 + g_term->server_offset; }
+inline datetime TimeGMT() { return g_term && g_term->tester ? TimeTradeServer() : g_utc_ms / 1000; }
 inline datetime TimeCurrent() { return g_term->tick_time_server ? g_term->tick_time_server : TimeTradeServer(); }
 inline datetime TimeLocal() { return TimeGMT() + 3600; }
 inline bool TimeToStruct(datetime t, MqlDateTime& d) {
@@ -219,6 +221,7 @@ inline void Comment(const string& s) { g_term->comment = s; }
 inline int GetLastError() { return 0; }
 inline void ResetLastError() {}
 inline bool EventSetMillisecondTimer(int) { return true; }
+inline bool EventSetTimer(int) { return true; }
 inline void EventKillTimer() {}
 
 // ------------------------------------------------------------------ terminale e conto
@@ -237,7 +240,7 @@ inline long TerminalInfoInteger(ENUM_TERMINAL_INFO_INTEGER p) {
   return g_term->algo_allowed ? 1 : 0;
 }
 inline string TerminalInfoString(ENUM_TERMINAL_INFO_STRING) { return g_common_dir; }
-inline long MQLInfoInteger(ENUM_MQL_INFO_INTEGER p) { return p == MQL_TRADE_ALLOWED ? 1 : 0; }
+inline long MQLInfoInteger(ENUM_MQL_INFO_INTEGER p) { return p == MQL_TRADE_ALLOWED ? 1 : (g_term->tester ? 1 : 0); }
 inline bool SymbolSelect(const string& s, bool) { return s == g_term->symbol; }
 inline long SymbolInfoInteger(const string& s, ENUM_SYMBOL_INFO_INTEGER p) {
   if (s != g_term->symbol) return 0;
@@ -257,6 +260,7 @@ inline double SymbolInfoDouble(const string& s, ENUM_SYMBOL_INFO_DOUBLE p) {
     case SYMBOL_VOLUME_MAX: return g_term->vmax;
     case SYMBOL_VOLUME_STEP: return g_term->vstep;
     case SYMBOL_TRADE_CONTRACT_SIZE: return g_term->contract;
+    case SYMBOL_TRADE_TICK_SIZE: return g_term->point;
   }
   return 0;
 }
@@ -441,7 +445,19 @@ inline bool OrderSend(MqlTradeRequest& r, MqlTradeResult& res) {
   res.retcode = TRADE_RETCODE_INVALID; return false;
 }
 
+// ------------------------------------------------------------------ variabili globali del terminale
+inline datetime GlobalVariableSet(const string& n, double v) { g_term->gv[n] = v; return TimeCurrent(); }
+inline double GlobalVariableGet(const string& n) { auto it = g_term->gv.find(n); return it == g_term->gv.end() ? 0.0 : it->second; }
+inline bool GlobalVariableCheck(const string& n) { return g_term->gv.count(n) > 0; }
+inline bool GlobalVariableDel(const string& n) { return g_term->gv.erase(n) > 0; }
+
 // ------------------------------------------------------------------ barre M15
+inline datetime iTime(const string& s, ENUM_TIMEFRAMES, int shift) {
+  if (s != g_term->symbol) return 0;
+  int n = (int)g_term->m15.size();
+  if (shift < 0 || shift >= n) return 0;
+  return g_term->m15[n - 1 - shift].time;
+}
 inline int iBarShift(const string& s, ENUM_TIMEFRAMES, datetime t, bool exact = false) {
   if (s != g_term->symbol) return -1;
   int n = (int)g_term->m15.size();

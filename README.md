@@ -3,23 +3,40 @@ Expert Advisor MQL5 per MetaTrader 5: copia condizionata dei trade WT67 dal cont
 
 | File | Contenuto |
 |---|---|
-| `WTSL-50%ercole.mq5` | l'Expert Advisor (unico file, ASCII) |
+| `WT67ercole.mq5` | il bot del conto 100k: strategia WaveTrend che apre i trade (magic 670067) |
+| `WTSL-50%ercole.mq5` | il collegamento: legge il WT67 sul 100k e copia sul 50k (magic 670050) |
 | `tests/RISULTATI_TEST.md` | tabella atteso/osservato dell'ultima esecuzione dei test simulati |
 | `tests/run_tests.sh` | compila il `.mq5` sul simulatore dell'API MT5 ed esegue i test |
-| `tests/mt5_shim.h`, `tests/test_wtsl50.cpp` | simulatore dei due terminali e scenari di prova |
+| `tests/mt5_shim.h`, `tests/test_wtsl50.cpp`, `tests/test_wt67.inc` | simulatore dei due terminali e scenari di prova |
 | `tests/wt_riferimento.py` | WaveTrend di riferimento con pandas |
 | `tests/mutazioni.py` | rompe una regola alla volta e verifica che un test la rilevi |
 
 ## Origine della strategia
 
-I file `WT67ercole.mq5` e `WT67_Collegamento_50k.mq5` non erano presenti nel repository
-(né in altri repository accessibili). L'EA è stato scritto dalla specifica: WaveTrend
-LazyBear 10/21/4 su M15 chiuse, 1,00 lotto sul 100k, SL/TP a 10,00, magic 670067,
-finestra 15:30–17:30 Europe/Rome. Prima dell'uso reale vanno confrontati con il WT67
-originale almeno: simbolo e magic delle sue posizioni, il fatto che chiuda da EA
-(`DEAL_REASON_EXPERT`) sull'incrocio opposto, e l'eventuale apertura immediata del trade inverso.
+I file originali `WT67ercole.mq5` e `WT67_Collegamento_50k.mq5` non erano presenti nel repository
+(né in altri repository accessibili). Entrambi i bot sono stati scritti dalla specifica.
+`WT67ercole.mq5` in questo repository è quindi una **ricostruzione**: se usi il tuo WT67 originale,
+WTSL-50%ercole funziona lo stesso purché le sue posizioni abbiano magic 670067 su XAUUSD e la chiusura
+sull'incrocio opposto sia fatta dall'EA (`DEAL_REASON_EXPERT`).
 
-## Come funziona
+## Il bot del 100k: WT67ercole.mq5
+
+* **Segnale.** WaveTrend LazyBear 10/21/4 su XAUUSD M15, confermato solo su candele chiuse. Alla prima quotazione
+  di una nuova candela confronta la candela appena chiusa con la precedente. Incrocio rialzista → BUY, ribassista → SELL.
+* **Ordine.** A mercato, 1,00 lotto (`InpLotti`), con SL e TP a 10,00 di prezzo (`InpDistanzaSL`/`InpDistanzaTP`)
+  dal prezzo eseguito: Ask per BUY, Bid per SELL. Se il broker esegue a un prezzo diverso, SL e TP vengono riallineati
+  a 10,00 dall'ingresso reale. Se mancano, vengono ripristinati.
+* **Regole.** Nuove aperture solo tra 15:30 inclusa e 17:30 esclusa (Europe/Rome, ora legale automatica), al massimo
+  `InpMaxTradeGiorno` (4) per giorno italiano, una posizione alla volta, un solo trade per candela anche dopo un riavvio.
+  L'ingresso deve avvenire entro `InpMaxRitardoSegnaleSec` (60 s) dall'apertura della candela: se l'EA parte più tardi,
+  il segnale è scaduto.
+* **Incrocio opposto.** Con una posizione aperta, la chiude subito (anche fuori orario) e, se le regole lo permettono,
+  apre quella inversa nello stesso istante. È la sequenza che WTSL-50%ercole riconosce per chiudere la copia sul 50k.
+* **Sicurezza.** Fuori dal Tester parte solo se il login è `InpConto100k`, quindi non può operare per errore sul 50k.
+* **Strategy Tester.** Si può fare il backtest. Il Tester non conosce l'ora UTC, quindi `InpOraServerTester` indica il fuso
+  del server: di default UTC+2, UTC+3 con l'ora legale USA, come sui server FTMO.
+
+## Il collegamento 100k → 50k: WTSL-50%ercole.mq5
 
 Lo stesso `.mq5` gira su **due terminali MT5 dello stesso utente Windows, sullo stesso PC o VPS**.
 Il ruolo dipende dal login del conto:
@@ -72,11 +89,12 @@ Se il registro non è scrivibile, l'ordine non viene inviato. Ogni evento è anc
 
 ## Installazione
 
-1. Copiare `WTSL-50%ercole.mq5` in `MQL5\Experts\` di **entrambi** i terminali e compilarlo con MetaEditor (F7).
+1. Copiare `WT67ercole.mq5` in `MQL5\Experts\` del terminale 100k e `WTSL-50%ercole.mq5` in `MQL5\Experts\` di **entrambi** i terminali,
+   poi compilarli con MetaEditor (F7).
    Da riga di comando: `metaeditor64.exe /compile:"MQL5\Experts\WTSL-50%ercole.mq5" /log`
    (in un file `.bat` scrivere `%%` al posto di `%`).
-2. Terminale 100k: lasciare il WT67 sul suo grafico XAUUSD e caricare WTSL-50%ercole su un **altro** grafico
-   (per esempio XAUUSD M15) con `InpConto100k` e `InpConto50k` impostati.
+2. Terminale 100k: caricare WT67ercole sul grafico XAUUSD M15 con `InpConto100k` impostato e WTSL-50%ercole su un **altro**
+   grafico (per esempio un secondo XAUUSD M15) con `InpConto100k` e `InpConto50k` impostati.
 3. Terminale 50k (conto hedging, simbolo XAUUSD con Fill or Kill): caricarlo sul grafico XAUUSD con gli stessi due login
    e Algo Trading attivo.
 4. Facoltativo: con `InpAutoTest=true` l'EA esegue solo 24 verifiche interne, tra cui `OrderCalcProfit` reale del broker
@@ -91,11 +109,15 @@ Nel Tester strategie l'EA non opera, perché servono due terminali vivi. Lì fun
 ## Test
 
 ```bash
-tests/run_tests.sh          # 42 scenari simulati, tabella in tests/RISULTATI_TEST.md
-python3 tests/mutazioni.py  # 26 mutazioni delle regole, tutte devono essere rilevate
+tests/run_tests.sh          # 58 scenari simulati, tabella in tests/RISULTATI_TEST.md
+python3 tests/mutazioni.py  # 41 mutazioni delle regole dei due bot, tutte devono essere rilevate
 ```
 
-I test sono **simulati**: il sorgente `.mq5` reale viene compilato con g++ dentro un simulatore dell'API MT5
+Il test E01 fa girare i tre EA insieme (WT67 e WTSL sorgente sul 100k, WTSL ricevitore sul 50k) su candele M15 sintetiche:
+incrocio rialzista → WT67 BUY a 3000 → copia BUY 0,50 a 2995 → incrocio ribassista → WT67 chiude e vende, copia chiusa →
+nuova copia SELL solo quando il nuovo trade raggiunge la sua soglia.
+
+I test sono **simulati**: i sorgenti `.mq5` reali vengono compilati con g++ dentro un simulatore dell'API MT5
 (due conti finti in USD, XAUUSD a 2 decimali, contratto da 100 once, cartella comune su disco).
 Verificano la logica, non la sintassi MQL5. Non sostituiscono la compilazione in MetaEditor
 né una prova su due terminali demo.
