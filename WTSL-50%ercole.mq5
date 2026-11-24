@@ -1650,11 +1650,12 @@ void VerificaCopiaAperta(const PianoOrdine &p, const MqlTradeResult &res)
          tipoOrdine = ORDER_TYPE_BUY;
       double pSL = 0.0;
       double pTP = 0.0;
-      OrderCalcProfit(tipoOrdine, InpSimbolo50k, volume, prezzo, p.sl, pSL);
-      OrderCalcProfit(tipoOrdine, InpSimbolo50k, volume, prezzo, p.tp, pTP);
+      string importi = " | importi lordi non calcolabili (OrderCalcProfit, errore " + IntegerToString(GetLastError()) + ")";
+      if(OrderCalcProfit(tipoOrdine, InpSimbolo50k, volume, prezzo, p.sl, pSL)
+         && OrderCalcProfit(tipoOrdine, InpSimbolo50k, volume, prezzo, p.tp, pTP))
+         importi = " | lordo allo stop " + Soldi(pSL) + ", al target " + Soldi(pTP);
       LogEvento("Copia aperta sul 50k: " + TipoTesto(p.tipo) + " " + DoubleToString(volume, 2) + " lotti a " + DoubleToString(prezzo, dg)
-                + " SL " + DoubleToString(sl, dg) + " TP " + DoubleToString(tp, dg)
-                + " | lordo allo stop " + Soldi(pSL) + ", al target " + Soldi(pTP));
+                + " SL " + DoubleToString(sl, dg) + " TP " + DoubleToString(tp, dg) + importi);
       if(MathAbs(prezzo - p.prezzo) > SymbolInfoDouble(InpSimbolo50k, SYMBOL_POINT) * 0.5)
          LogEvento("ATTENZIONE: eseguito a " + DoubleToString(prezzo, dg) + " invece di " + DoubleToString(p.prezzo, dg)
                    + " (slittamento): gli importi lordi realizzabili cambiano");
